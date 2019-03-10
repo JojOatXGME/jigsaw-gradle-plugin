@@ -1,0 +1,39 @@
+plugins {
+    id 'java-gradle-plugin'
+}
+
+group 'de.xgme.jojo'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 11
+
+repositories {
+    mavenCentral()
+}
+
+gradlePlugin {
+    plugins {
+        basePlugin {
+            id = 'de.xgme.jojo.jigsaw-base'
+            implementationClass = 'de.xgme.jojo.jigsaw_gradle_plugin.JigsawBasePlugin'
+        }
+        conventionPlugin {
+            id = 'de.xgme.jojo.jigsaw'
+            implementationClass = 'de.xgme.jojo.jigsaw_gradle_plugin.JigsawConventionPlugin'
+        }
+        generatorPlugin {
+            id = 'de.xgme.jojo.jigsaw-generator'
+            implementationClass = 'de.xgme.jojo.jigsaw_gradle_plugin.JigsawGeneratorPlugin'
+        }
+    }
+}
+
+dependencies {
+    implementation 'org.jetbrains:annotations:16.0.3'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.4.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.4.0'
+}
+
+test {
+    useJUnitPlatform()
+}
