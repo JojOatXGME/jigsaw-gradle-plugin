@@ -1,0 +1,14 @@
+package de.xgme.jojo.jigsaw_gradle_plugin.classification;
+
+import org.junit.jupiter.api.Tag;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+@Target({ElementType.TYPE, ElementType.METHOD })
+@Retention(RetentionPolicy.RUNTIME)
+@Tag("functional")
+public @interface Functional {
+}
