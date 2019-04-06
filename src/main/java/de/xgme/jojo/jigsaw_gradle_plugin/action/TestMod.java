@@ -17,8 +17,6 @@ public final class TestMod {
 
   public static void apply(@NotNull Test task, @NotNull TestExtension extension) {
     task.doFirst(new ReconfigurationAction(extension));
-    task.getInputs().property("jigsaw.enabled", callable(extension::isEnabled));
-    task.getInputs().property("jigsaw.moduleName", callable(extension::getModuleName)).optional(true);
   }
 
   private static <T> @NotNull Callable<T> callable(@NotNull Callable<T> callable) {

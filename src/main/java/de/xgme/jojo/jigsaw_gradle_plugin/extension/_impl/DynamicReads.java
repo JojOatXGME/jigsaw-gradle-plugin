@@ -4,12 +4,13 @@ import de.xgme.jojo.jigsaw_gradle_plugin.extension.spec.DynamicReadsDeclaration;
 import de.xgme.jojo.jigsaw_gradle_plugin.extension.spec.DynamicReadsSpec;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
-final class DynamicReads implements DynamicReadsDeclaration, DynamicReadsSpec {
+final class DynamicReads implements DynamicReadsDeclaration, DynamicReadsSpec, Serializable {
   private final @NotNull List<String> requiredModules;
   private @NotNull       List<String> affectedModules;
 

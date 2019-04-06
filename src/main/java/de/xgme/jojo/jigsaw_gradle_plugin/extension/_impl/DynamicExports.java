@@ -4,12 +4,13 @@ import de.xgme.jojo.jigsaw_gradle_plugin.extension.spec.DynamicExportsDeclaratio
 import de.xgme.jojo.jigsaw_gradle_plugin.extension.spec.DynamicExportsSpec;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
-final class DynamicExports implements DynamicExportsDeclaration, DynamicExportsSpec {
+final class DynamicExports implements DynamicExportsDeclaration, DynamicExportsSpec, Serializable {
   private final @NotNull List<String> packageNames;
   private @NotNull       String       sourceModule;
   private @NotNull       List<String> targetModules;

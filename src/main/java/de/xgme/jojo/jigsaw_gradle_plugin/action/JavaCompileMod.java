@@ -21,9 +21,6 @@ public final class JavaCompileMod {
 
   public static void apply(@NotNull JavaCompile task, @NotNull JavaCompileExtension extension) {
     task.doFirst(new ReconfigurationAction(extension));
-    task.getInputs().property("jigsaw.enabled", callable(extension::isEnabled));
-    task.getInputs().property("jigsaw.moduleName", callable(extension::getModuleName)).optional(true);
-    task.getInputs().property("jigsaw.moduleVersion", callable(extension::getModuleVersion)).optional(true);
   }
 
   private static <T> @NotNull Callable<T> callable(@NotNull Callable<T> callable) {

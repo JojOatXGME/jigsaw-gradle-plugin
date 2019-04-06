@@ -27,8 +27,6 @@ public final class CreateStartScriptsMod {
   public static void apply(@NotNull CreateStartScripts task, @NotNull CreateStartScriptsExtension extension) {
     task.doFirst(new ReconfigurationAction(extension));
     task.doLast(new PostprocessingAction(extension));
-    task.getInputs().property("jigsaw.enabled", callable(extension::isEnabled));
-    task.getInputs().property("jigsaw.moduleName", callable(extension::getModuleName)).optional(true);
   }
 
   private static <T> @NotNull Callable<T> callable(@NotNull Callable<T> callable) {

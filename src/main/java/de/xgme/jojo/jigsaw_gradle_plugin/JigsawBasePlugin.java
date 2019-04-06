@@ -4,6 +4,7 @@ import de.xgme.jojo.jigsaw_gradle_plugin.action.*;
 import de.xgme.jojo.jigsaw_gradle_plugin.extension.project.BaseProjectExtension;
 import de.xgme.jojo.jigsaw_gradle_plugin.extension._impl.TaskExtensionImpl;
 import de.xgme.jojo.jigsaw_gradle_plugin.extension.task.*;
+import de.xgme.jojo.jigsaw_gradle_plugin.util.TaskUtil;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
@@ -27,8 +28,8 @@ public class JigsawBasePlugin implements Plugin<Project> {
     BaseProjectExtension projectExtension = target.getExtensions().create("jigsaw", BaseProjectExtension.class);
 
     target.getTasks().withType(JavaCompile.class, task -> {
-      JavaCompileExtension extension = task.getExtensions().create(JavaCompileExtension.class, "jigsaw",
-                                                                   TaskExtensionImpl.class, projectExtension);
+      JavaCompileExtension extension = TaskUtil.createExtension(task, JavaCompileExtension.class, "jigsaw",
+                                                                TaskExtensionImpl.class, projectExtension);
       JavaCompileMod.apply(task, extension);
     });
 
@@ -36,34 +37,35 @@ public class JigsawBasePlugin implements Plugin<Project> {
     // todo Check compilerTestJava (probably also JavaCompile.class).
 
     target.getTasks().withType(Test.class, task -> {
-      TestExtension extension = task.getExtensions().create(TestExtension.class, "jigsaw",
-                                                            TaskExtensionImpl.class, projectExtension);
+      TestExtension extension = TaskUtil.createExtension(task, TestExtension.class, "jigsaw",
+                                                         TaskExtensionImpl.class, projectExtension);
       TestMod.apply(task, extension);
     });
 
     target.getTasks().withType(Javadoc.class, task -> {
-      JavadocExtension extension = task.getExtensions().create(JavadocExtension.class, "jigsaw",
-                                                               TaskExtensionImpl.class, projectExtension);
+      JavadocExtension extension = TaskUtil.createExtension(task, JavadocExtension.class, "jigsaw",
+                                                            TaskExtensionImpl.class, projectExtension);
       JavadocMod.apply(task, extension);
     });
 
     target.getTasks().withType(Jar.class, task -> {
-      JarExtension extension = task.getExtensions().create(JarExtension.class, "jigsaw",
-                                                           TaskExtensionImpl.class, projectExtension);
+      JarExtension extension = TaskUtil.createExtension(task, JarExtension.class, "jigsaw",
+                                                        TaskExtensionImpl.class, projectExtension);
       // todo Add option for --module-version.
       // todo Add option for --hash-modules.
       // todo Add option --main-class=<class>.
     });
 
     target.getTasks().withType(JavaExec.class, task -> {
-      JavaExecExtension extension = task.getExtensions().create(JavaExecExtension.class, "jigsaw",
-                                                                TaskExtensionImpl.class, projectExtension);
+      JavaExecExtension extension = TaskUtil.createExtension(task, JavaExecExtension.class, "jigsaw",
+                                                             TaskExtensionImpl.class, projectExtension);
       JavaExecMod.apply(task, extension);
     });
 
     target.getTasks().withType(CreateStartScripts.class, task -> {
-      CreateStartScriptsExtension extension = task.getExtensions().create(CreateStartScriptsExtension.class, "jigsaw",
-                                                                          TaskExtensionImpl.class, projectExtension);
+      CreateStartScriptsExtension extension = TaskUtil.createExtension(task, CreateStartScriptsExtension.class,
+                                                                       "jigsaw",
+                                                                       TaskExtensionImpl.class, projectExtension);
       CreateStartScriptsMod.apply(task, extension);
     });
   }
