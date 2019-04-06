@@ -30,7 +30,7 @@ public class JigsawBasePlugin implements Plugin<Project> {
     target.getTasks().withType(JavaCompile.class, task -> {
       JavaCompileExtension extension = TaskUtil.createExtension(task, JavaCompileExtension.class, "jigsaw",
                                                                 TaskExtensionImpl.class, projectExtension);
-      JavaCompileMod.apply(task, extension);
+      task.doFirst(new JavaCompileReconfigurationAction(extension));
     });
 
     // todo Add support for JMOD archives? (https://openjdk.java.net/jeps/261)
@@ -39,13 +39,13 @@ public class JigsawBasePlugin implements Plugin<Project> {
     target.getTasks().withType(Test.class, task -> {
       TestExtension extension = TaskUtil.createExtension(task, TestExtension.class, "jigsaw",
                                                          TaskExtensionImpl.class, projectExtension);
-      TestMod.apply(task, extension);
+      task.doFirst(new TestReconfigurationAction(extension));
     });
 
     target.getTasks().withType(Javadoc.class, task -> {
       JavadocExtension extension = TaskUtil.createExtension(task, JavadocExtension.class, "jigsaw",
                                                             TaskExtensionImpl.class, projectExtension);
-      JavadocMod.apply(task, extension);
+      task.doFirst(new JavadocReconfigurationAction(extension));
     });
 
     target.getTasks().withType(Jar.class, task -> {
@@ -59,14 +59,15 @@ public class JigsawBasePlugin implements Plugin<Project> {
     target.getTasks().withType(JavaExec.class, task -> {
       JavaExecExtension extension = TaskUtil.createExtension(task, JavaExecExtension.class, "jigsaw",
                                                              TaskExtensionImpl.class, projectExtension);
-      JavaExecMod.apply(task, extension);
+      task.doFirst(new JavaExecReconfigurationAction(extension));
     });
 
     target.getTasks().withType(CreateStartScripts.class, task -> {
       CreateStartScriptsExtension extension = TaskUtil.createExtension(task, CreateStartScriptsExtension.class,
                                                                        "jigsaw",
                                                                        TaskExtensionImpl.class, projectExtension);
-      CreateStartScriptsMod.apply(task, extension);
+      task.doFirst(new CreateStartScriptsReconfigurationAction(extension));
+      task.doLast(new CreateStartScriptsPostprocessingAction(extension));
     });
   }
 }
