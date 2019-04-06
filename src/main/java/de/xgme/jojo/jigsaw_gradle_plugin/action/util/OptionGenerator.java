@@ -1,6 +1,7 @@
-package de.xgme.jojo.jigsaw_gradle_plugin.extension._impl;
+package de.xgme.jojo.jigsaw_gradle_plugin.action.util;
 
-import de.xgme.jojo.jigsaw_gradle_plugin.extension.util.JavaDocOption;
+import de.xgme.jojo.jigsaw_gradle_plugin.extension.spec.DynamicExportsDeclaration;
+import de.xgme.jojo.jigsaw_gradle_plugin.extension.spec.DynamicReadsDeclaration;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -12,10 +13,11 @@ public class OptionGenerator {
     // This class cannot be instantiated.
   }
 
-  public static @NotNull List<String> generateArguments(@NotNull String thisModuleName,
-                                                        @NotNull Collection<AdditionalExports> additionalExports,
-                                                        @NotNull Collection<AdditionalExports> additionalOpens,
-                                                        @NotNull Collection<AdditionalReads> additionalReads)
+  public static @NotNull List<String> generateArguments(
+    @NotNull String thisModuleName,
+    @NotNull Collection<? extends DynamicExportsDeclaration> additionalExports,
+    @NotNull Collection<? extends DynamicExportsDeclaration> additionalOpens,
+    @NotNull Collection<? extends DynamicReadsDeclaration> additionalReads)
   {
     Options options = generateOptions(thisModuleName, additionalExports, additionalOpens, additionalReads);
 
@@ -36,19 +38,14 @@ public class OptionGenerator {
     return result;
   }
 
-  public static @NotNull List<JavaDocOption> generateJavaDocOptions(@NotNull String thisModuleName,
-                                                                    @NotNull Collection<AdditionalExports> additionalExports,
-                                                                    @NotNull Collection<AdditionalExports> additionalOpens,
-                                                                    @NotNull Collection<AdditionalReads> additionalReads)
+  public static @NotNull List<JavaDocOption> generateJavaDocOptions(
+    @NotNull String thisModuleName,
+    @NotNull Collection<? extends DynamicExportsDeclaration> additionalExports,
+    @NotNull Collection<? extends DynamicReadsDeclaration> additionalReads)
   {
-    Options options = generateOptions(thisModuleName, additionalExports, additionalOpens, additionalReads);
+    Options options = generateOptions(thisModuleName, additionalExports, Collections.emptyList(), additionalReads);
 
-    // todo Which options are required for JavaDoc generation? Check against documentation.
     List<JavaDocOption> result = new ArrayList<>();
-    for (Map.Entry<String, Set<String>> openData : options.opens.entrySet()) {
-      result.add(new JavaDocOption("-add-opens",
-                                   openData.getKey() + "=" + String.join(",", openData.getValue())));
-    }
     for (Map.Entry<String, Set<String>> openData : options.exports.entrySet()) {
       result.add(new JavaDocOption("-add-exports",
                                    openData.getKey() + "=" + String.join(",", openData.getValue())));
@@ -61,10 +58,11 @@ public class OptionGenerator {
     return result;
   }
 
-  private static @NotNull Options generateOptions(@NotNull String thisModuleName,
-                                                  @NotNull Collection<AdditionalExports> additionalExports,
-                                                  @NotNull Collection<AdditionalExports> additionalOpens,
-                                                  @NotNull Collection<AdditionalReads> additionalReads)
+  private static @NotNull Options generateOptions(
+    @NotNull String thisModuleName,
+    @NotNull Collection<? extends DynamicExportsDeclaration> additionalExports,
+    @NotNull Collection<? extends DynamicExportsDeclaration> additionalOpens,
+    @NotNull Collection<? extends DynamicReadsDeclaration> additionalReads)
   {
     // todo --add-opens only required at runtime.
     Map<String, Set<String>> exports = processExports(additionalExports, thisModuleName);
@@ -88,13 +86,14 @@ public class OptionGenerator {
     return new Options(exports, opens, reads);
   }
 
-  private static @NotNull Map<String, Set<String>> processExports(@NotNull Collection<AdditionalExports> specs,
-                                                                  @NotNull String thisModuleName)
+  private static @NotNull Map<String, Set<String>> processExports(
+    @NotNull Collection<? extends DynamicExportsDeclaration> specs,
+    @NotNull String thisModuleName)
   {
     // todo Support ALL-UNNAMED.
     // I want to keep order from specification when suitable. Therefore, I use LinkedHashMap and LinkedHashSet.
     Map<String, Set<String>> result = new LinkedHashMap<>();
-    for (AdditionalExports exports : specs) {
+    for (DynamicExportsDeclaration exports : specs) {
       for (String packageName : exports.getPackageNames()) {
         String      source  = resolveThis(exports.getSourceModule(), thisModuleName) + "/" + packageName;
         Set<String> targets = result.computeIfAbsent(source, __ -> new LinkedHashSet<>());
@@ -106,13 +105,14 @@ public class OptionGenerator {
     return result;
   }
 
-  private static @NotNull Map<String, Set<String>> processReads(@NotNull Collection<AdditionalReads> specs,
-                                                                @NotNull String thisModuleName)
+  private static @NotNull Map<String, Set<String>> processReads(
+    @NotNull Collection<? extends DynamicReadsDeclaration> specs,
+    @NotNull String thisModuleName)
   {
     // todo support for ALL-UNNAMED
     // I want to keep order from specification when suitable. Therefore, I use LinkedHashMap and LinkedHashSet.
     Map<String, Set<String>> result = new LinkedHashMap<>();
-    for (AdditionalReads reads : specs) {
+    for (DynamicReadsDeclaration reads : specs) {
       for (String affectedModule : reads.getAffectedModules()) {
         String      affectedModuleName = resolveThis(affectedModule, thisModuleName);
         Set<String> requiredModules    = result.computeIfAbsent(affectedModuleName, __ -> new LinkedHashSet<>());

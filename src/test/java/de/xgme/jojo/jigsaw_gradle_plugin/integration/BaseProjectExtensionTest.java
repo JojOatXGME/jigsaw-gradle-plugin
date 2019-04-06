@@ -2,8 +2,9 @@ package de.xgme.jojo.jigsaw_gradle_plugin.integration;
 
 import de.xgme.jojo.jigsaw_gradle_plugin.JigsawBasePlugin;
 import de.xgme.jojo.jigsaw_gradle_plugin.classification.Integration;
-import de.xgme.jojo.jigsaw_gradle_plugin.extension.BaseProjectExtension;
-import de.xgme.jojo.jigsaw_gradle_plugin.extension.BasicTaskExtension;
+import de.xgme.jojo.jigsaw_gradle_plugin.extension.project.BaseProjectExtension;
+import de.xgme.jojo.jigsaw_gradle_plugin.extension.task.capabilities.Activatable;
+import de.xgme.jojo.jigsaw_gradle_plugin.extension.task.capabilities.WithModuleName;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
 import org.gradle.api.plugins.ApplicationPlugin;
@@ -15,7 +16,9 @@ import org.gradle.api.tasks.compile.JavaCompile;
 import org.gradle.api.tasks.javadoc.Javadoc;
 import org.gradle.testfixtures.ProjectBuilder;
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 @DisplayName("BaseProjectExtension ...")
 @Integration
@@ -40,8 +43,7 @@ class BaseProjectExtensionTest {
       () -> assertModuleName(getTask(project, JavaPlugin.TEST_TASK_NAME), MODULE_NAME),
       () -> assertEnabled(getTask(project, JavaPlugin.JAVADOC_TASK_NAME), true),
       () -> assertModuleName(getTask(project, JavaPlugin.JAVADOC_TASK_NAME), MODULE_NAME),
-      () -> assertEnabled(getTask(project, JavaPlugin.JAR_TASK_NAME), true),
-      () -> assertModuleName(getTask(project, JavaPlugin.JAR_TASK_NAME), MODULE_NAME));
+      () -> assertEnabled(getTask(project, JavaPlugin.JAR_TASK_NAME), true));
   }
 
   @Test
@@ -83,7 +85,6 @@ class BaseProjectExtensionTest {
       () -> assertEnabled(javadocTask, true),
       () -> assertModuleName(javadocTask, MODULE_NAME),
       () -> assertEnabled(jarTask, true),
-      () -> assertModuleName(jarTask, MODULE_NAME),
       () -> assertEnabled(runTask, true),
       () -> assertModuleName(runTask, MODULE_NAME),
       () -> assertEnabled(createStartScriptsTask, true),
@@ -99,12 +100,12 @@ class BaseProjectExtensionTest {
   }
 
   private static void assertEnabled(@NotNull Task task, boolean expected) {
-    Assertions.assertEquals(expected, getExtension(task, BasicTaskExtension.class).isEnabled(),
+    Assertions.assertEquals(expected, getExtension(task, Activatable.class).isEnabled(),
                             task.getName() + ".enabled");
   }
 
   private static void assertModuleName(@NotNull Task task, String expected) {
-    Assertions.assertEquals(expected, getExtension(task, BasicTaskExtension.class).getModuleName(),
+    Assertions.assertEquals(expected, getExtension(task, WithModuleName.class).getModuleName(),
                             task.getName() + ".moduleName");
   }
 

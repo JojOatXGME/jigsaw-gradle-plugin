@@ -1,8 +1,9 @@
 package de.xgme.jojo.jigsaw_gradle_plugin.action;
 
 import de.xgme.jojo.jigsaw_gradle_plugin.action.util.ListUtil;
+import de.xgme.jojo.jigsaw_gradle_plugin.action.util.OptionGenerator;
 import de.xgme.jojo.jigsaw_gradle_plugin.action.util.SourceUtil;
-import de.xgme.jojo.jigsaw_gradle_plugin.extension.CompileTaskExtension;
+import de.xgme.jojo.jigsaw_gradle_plugin.extension.task.JavaCompileExtension;
 import org.gradle.api.Action;
 import org.gradle.api.Task;
 import org.gradle.api.tasks.compile.JavaCompile;
@@ -18,7 +19,7 @@ public final class JavaCompileMod {
     // This class cannot be instantiated.
   }
 
-  public static void apply(@NotNull JavaCompile task, @NotNull CompileTaskExtension extension) {
+  public static void apply(@NotNull JavaCompile task, @NotNull JavaCompileExtension extension) {
     task.doFirst(new ReconfigurationAction(extension));
     task.getInputs().property("jigsaw.enabled", callable(extension::isEnabled));
     task.getInputs().property("jigsaw.moduleName", callable(extension::getModuleName)).optional(true);
@@ -30,9 +31,9 @@ public final class JavaCompileMod {
   }
 
   private static class ReconfigurationAction implements Action<Task> {
-    private @NotNull CompileTaskExtension extension;
+    private @NotNull JavaCompileExtension extension;
 
-    private ReconfigurationAction(@NotNull CompileTaskExtension extension) {
+    private ReconfigurationAction(@NotNull JavaCompileExtension extension) {
       this.extension = extension;
     }
 
@@ -60,7 +61,8 @@ public final class JavaCompileMod {
         List.of("--module-path", task.getClasspath().getAsPath(),
                 "--patch-module", moduleName + "=" + task.getSource().getAsPath()), // todo Should not be necessary.
         moduleVersion == null ? Collections.emptyList() : List.of("--module-version", moduleVersion),
-        extension.getModuleInfoAdditionsAsCommandLineArguments(moduleName)));
+        OptionGenerator.generateArguments(moduleName,
+                                          extension.getExports(), Collections.emptyList(), extension.getReads())));
       task.setClasspath(task.getProject().files()); // todo "pre-compiled" files should be passed here.
     }
   }

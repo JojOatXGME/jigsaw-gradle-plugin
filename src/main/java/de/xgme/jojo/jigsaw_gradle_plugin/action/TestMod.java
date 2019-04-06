@@ -1,6 +1,7 @@
 package de.xgme.jojo.jigsaw_gradle_plugin.action;
 
-import de.xgme.jojo.jigsaw_gradle_plugin.extension.BasicTaskExtension;
+import de.xgme.jojo.jigsaw_gradle_plugin.action.util.OptionGenerator;
+import de.xgme.jojo.jigsaw_gradle_plugin.extension.task.TestExtension;
 import org.gradle.api.Action;
 import org.gradle.api.Task;
 import org.gradle.api.tasks.testing.Test;
@@ -14,7 +15,7 @@ public final class TestMod {
     // This class cannot be instantiated.
   }
 
-  public static void apply(@NotNull Test task, @NotNull BasicTaskExtension extension) {
+  public static void apply(@NotNull Test task, @NotNull TestExtension extension) {
     task.doFirst(new ReconfigurationAction(extension));
     task.getInputs().property("jigsaw.enabled", callable(extension::isEnabled));
     task.getInputs().property("jigsaw.moduleName", callable(extension::getModuleName)).optional(true);
@@ -25,9 +26,9 @@ public final class TestMod {
   }
 
   private static class ReconfigurationAction implements Action<Task> {
-    private @NotNull BasicTaskExtension extension;
+    private @NotNull TestExtension extension;
 
-    private ReconfigurationAction(@NotNull BasicTaskExtension extension) {
+    private ReconfigurationAction(@NotNull TestExtension extension) {
       this.extension = extension;
     }
 
@@ -50,7 +51,9 @@ public final class TestMod {
       task.jvmArgs("--module-path", task.getClasspath().getAsPath(),
                    "--patch-module", moduleName + "=" + task.getTestClassesDirs().getAsPath(), // todo does it work?
                    "--add-modules", "ALL-MODULE-PATH");
-      task.jvmArgs(extension.getModuleInfoAdditionsAsCommandLineArguments(moduleName));
+      task.jvmArgs(OptionGenerator.generateArguments(moduleName,
+                                                     extension.getExports(), extension.getOpens(),
+                                                     extension.getReads()));
       task.setClasspath(task.getProject().files());
     }
   }

@@ -1,6 +1,7 @@
 package de.xgme.jojo.jigsaw_gradle_plugin.action;
 
-import de.xgme.jojo.jigsaw_gradle_plugin.extension.BasicTaskExtension;
+import de.xgme.jojo.jigsaw_gradle_plugin.action.util.OptionGenerator;
+import de.xgme.jojo.jigsaw_gradle_plugin.extension.task.JavaExecExtension;
 import org.gradle.api.Action;
 import org.gradle.api.Task;
 import org.gradle.api.tasks.JavaExec;
@@ -14,7 +15,7 @@ public final class JavaExecMod {
     // This class cannot be instantiated.
   }
 
-  public static void apply(@NotNull JavaExec task, @NotNull BasicTaskExtension extension) {
+  public static void apply(@NotNull JavaExec task, @NotNull JavaExecExtension extension) {
     task.doFirst(new ReconfigurationAction(extension));
     task.getInputs().property("jigsaw.enabled", callable(extension::isEnabled));
     task.getInputs().property("jigsaw.moduleName", callable(extension::getModuleName)).optional(true);
@@ -25,9 +26,9 @@ public final class JavaExecMod {
   }
 
   private static class ReconfigurationAction implements Action<Task> {
-    private @NotNull BasicTaskExtension extension;
+    private @NotNull JavaExecExtension extension;
 
-    private ReconfigurationAction(@NotNull BasicTaskExtension extension) {
+    private ReconfigurationAction(@NotNull JavaExecExtension extension) {
       this.extension = extension;
     }
 
@@ -56,7 +57,9 @@ public final class JavaExecMod {
       if (mainClass != null) {
         task.jvmArgs("--module", mainClass);
       }
-      task.jvmArgs(extension.getModuleInfoAdditionsAsCommandLineArguments(moduleName));
+      task.jvmArgs(OptionGenerator.generateArguments(moduleName,
+                                                     extension.getExports(), extension.getOpens(),
+                                                     extension.getReads()));
       task.setClasspath(task.getProject().files());
       // todo Should task.setMain(null) be called?
     }

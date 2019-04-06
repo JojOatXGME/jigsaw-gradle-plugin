@@ -1,4 +1,4 @@
-package de.xgme.jojo.jigsaw_gradle_plugin.extension.util;
+package de.xgme.jojo.jigsaw_gradle_plugin.action.util;
 
 import org.jetbrains.annotations.NotNull;
 

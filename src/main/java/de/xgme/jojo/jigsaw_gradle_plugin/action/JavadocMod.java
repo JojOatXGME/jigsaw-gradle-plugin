@@ -1,8 +1,9 @@
 package de.xgme.jojo.jigsaw_gradle_plugin.action;
 
+import de.xgme.jojo.jigsaw_gradle_plugin.action.util.OptionGenerator;
 import de.xgme.jojo.jigsaw_gradle_plugin.action.util.SourceUtil;
-import de.xgme.jojo.jigsaw_gradle_plugin.extension.BasicTaskExtension;
-import de.xgme.jojo.jigsaw_gradle_plugin.extension.util.JavaDocOption;
+import de.xgme.jojo.jigsaw_gradle_plugin.extension.task.JavadocExtension;
+import de.xgme.jojo.jigsaw_gradle_plugin.action.util.JavaDocOption;
 import org.gradle.api.Action;
 import org.gradle.api.Task;
 import org.gradle.api.tasks.javadoc.Javadoc;
@@ -10,6 +11,7 @@ import org.gradle.external.javadoc.CoreJavadocOptions;
 import org.gradle.external.javadoc.MinimalJavadocOptions;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.concurrent.Callable;
 
 public final class JavadocMod {
@@ -18,7 +20,7 @@ public final class JavadocMod {
     // This class cannot be instantiated.
   }
 
-  public static void apply(@NotNull Javadoc task, @NotNull BasicTaskExtension extension) {
+  public static void apply(@NotNull Javadoc task, @NotNull JavadocExtension extension) {
     task.doFirst(new ReconfigurationAction(extension));
     task.getInputs().property("jigsaw.enabled", callable(extension::isEnabled));
     task.getInputs().property("jigsaw.moduleName", callable(extension::getModuleName)).optional(true);
@@ -29,9 +31,9 @@ public final class JavadocMod {
   }
 
   private static class ReconfigurationAction implements Action<Task> {
-    private @NotNull BasicTaskExtension extension;
+    private @NotNull JavadocExtension extension;
 
-    private ReconfigurationAction(@NotNull BasicTaskExtension extension) {
+    private ReconfigurationAction(@NotNull JavadocExtension extension) {
       this.extension = extension;
     }
 
@@ -51,9 +53,12 @@ public final class JavadocMod {
         if (moduleName == null) {
           moduleName = SourceUtil.findModuleNameFromSource(task.getSource());
         }
+        List<JavaDocOption> dynamicModuleOptions = OptionGenerator.generateJavaDocOptions(moduleName,
+                                                                                          extension.getExports(),
+                                                                                          extension.getReads());
         // todo Is --patch-module option required for JavaDoc generation in some cases?
         ((CoreJavadocOptions) options).addStringOption("-module-path", task.getClasspath().getAsPath());
-        for (JavaDocOption option : extension.getModuleInfoAdditionsAsJavaDocOptions(moduleName)) {
+        for (JavaDocOption option : dynamicModuleOptions) {
           ((CoreJavadocOptions) options).addStringOption(option.getName(), option.getValue());
         }
         task.setClasspath(task.getProject().files());

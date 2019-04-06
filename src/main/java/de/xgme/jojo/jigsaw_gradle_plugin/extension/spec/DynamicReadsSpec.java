@@ -1,12 +1,12 @@
 package de.xgme.jojo.jigsaw_gradle_plugin.extension.spec;
 
-import de.xgme.jojo.jigsaw_gradle_plugin.extension._impl.OptionGenerator;
+import de.xgme.jojo.jigsaw_gradle_plugin.action.util.OptionGenerator;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-public interface AdditionalReadsSpec {
+public interface DynamicReadsSpec {
   String THIS = OptionGenerator.THIS;
 
   @Contract("_ -> this")
-  AdditionalReadsSpec in(@NotNull String... modules);
+  DynamicReadsSpec in(@NotNull String... affectedModules);
 }

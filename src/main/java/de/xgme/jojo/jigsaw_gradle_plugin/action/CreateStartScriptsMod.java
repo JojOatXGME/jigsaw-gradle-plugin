@@ -1,7 +1,8 @@
 package de.xgme.jojo.jigsaw_gradle_plugin.action;
 
 import de.xgme.jojo.jigsaw_gradle_plugin.action.util.ListUtil;
-import de.xgme.jojo.jigsaw_gradle_plugin.extension.BasicTaskExtension;
+import de.xgme.jojo.jigsaw_gradle_plugin.action.util.OptionGenerator;
+import de.xgme.jojo.jigsaw_gradle_plugin.extension.task.CreateStartScriptsExtension;
 import org.gradle.api.Action;
 import org.gradle.api.GradleException;
 import org.gradle.api.Task;
@@ -23,7 +24,7 @@ public final class CreateStartScriptsMod {
     // This class cannot be instantiated.
   }
 
-  public static void apply(@NotNull CreateStartScripts task, @NotNull BasicTaskExtension extension) {
+  public static void apply(@NotNull CreateStartScripts task, @NotNull CreateStartScriptsExtension extension) {
     task.doFirst(new ReconfigurationAction(extension));
     task.doLast(new PostprocessingAction(extension));
     task.getInputs().property("jigsaw.enabled", callable(extension::isEnabled));
@@ -43,9 +44,9 @@ public final class CreateStartScriptsMod {
   }
 
   private static class ReconfigurationAction implements Action<Task> {
-    private @NotNull BasicTaskExtension extension;
+    private @NotNull CreateStartScriptsExtension extension;
 
-    private ReconfigurationAction(@NotNull BasicTaskExtension extension) {
+    private ReconfigurationAction(@NotNull CreateStartScriptsExtension extension) {
       this.extension = extension;
     }
 
@@ -73,16 +74,19 @@ public final class CreateStartScriptsMod {
                                              List.of("--module-path", "APP_HOME_LIBS_PLACEHOLDER"),
                                              mainClass == null ? Collections.emptyList()
                                                                : List.of("--module", mainClass),
-                                             extension.getModuleInfoAdditionsAsCommandLineArguments(moduleName)));
+                                             OptionGenerator.generateArguments(moduleName,
+                                                                               extension.getExports(),
+                                                                               extension.getOpens(),
+                                                                               extension.getReads())));
       task.setClasspath(task.getProject().files());
       // todo Should task.setMainClassName(null) be called?
     }
   }
 
   private static class PostprocessingAction implements Action<Task> {
-    private @NotNull BasicTaskExtension extension;
+    private @NotNull CreateStartScriptsExtension extension;
 
-    private PostprocessingAction(@NotNull BasicTaskExtension extension) {
+    private PostprocessingAction(@NotNull CreateStartScriptsExtension extension) {
       this.extension = extension;
     }
 
