@@ -1,4 +1,4 @@
-package de.xgme.jojo.jigsaw_gradle_plugin.extension.task.property_marker;
+package de.xgme.jojo.jigsaw_gradle_plugin.extension.task._property_marker;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

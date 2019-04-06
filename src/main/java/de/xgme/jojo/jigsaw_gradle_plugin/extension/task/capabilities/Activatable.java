@@ -1,6 +1,6 @@
 package de.xgme.jojo.jigsaw_gradle_plugin.extension.task.capabilities;
 
-import de.xgme.jojo.jigsaw_gradle_plugin.extension.task.property_marker.Input;
+import de.xgme.jojo.jigsaw_gradle_plugin.extension.task._property_marker.Input;
 
 public interface Activatable {
   @Input

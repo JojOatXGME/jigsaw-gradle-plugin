@@ -2,7 +2,7 @@ package de.xgme.jojo.jigsaw_gradle_plugin.extension.task.capabilities;
 
 import de.xgme.jojo.jigsaw_gradle_plugin.extension.spec.DynamicExportsDeclaration;
 import de.xgme.jojo.jigsaw_gradle_plugin.extension.spec.DynamicExportsSpec;
-import de.xgme.jojo.jigsaw_gradle_plugin.extension.task.property_marker.Input;
+import de.xgme.jojo.jigsaw_gradle_plugin.extension.task._property_marker.Input;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;

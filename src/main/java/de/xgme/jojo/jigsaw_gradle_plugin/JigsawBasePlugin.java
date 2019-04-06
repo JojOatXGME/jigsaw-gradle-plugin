@@ -1,10 +1,10 @@
 package de.xgme.jojo.jigsaw_gradle_plugin;
 
-import de.xgme.jojo.jigsaw_gradle_plugin.action.*;
+import de.xgme.jojo.jigsaw_gradle_plugin._action.*;
 import de.xgme.jojo.jigsaw_gradle_plugin.extension.project.BaseProjectExtension;
 import de.xgme.jojo.jigsaw_gradle_plugin.extension._impl.TaskExtensionImpl;
 import de.xgme.jojo.jigsaw_gradle_plugin.extension.task.*;
-import de.xgme.jojo.jigsaw_gradle_plugin.util.TaskUtil;
+import de.xgme.jojo.jigsaw_gradle_plugin._util.TaskUtil;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;

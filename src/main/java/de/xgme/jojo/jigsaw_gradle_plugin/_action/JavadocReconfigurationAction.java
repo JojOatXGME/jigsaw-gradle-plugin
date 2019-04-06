@@ -1,8 +1,8 @@
-package de.xgme.jojo.jigsaw_gradle_plugin.action;
+package de.xgme.jojo.jigsaw_gradle_plugin._action;
 
-import de.xgme.jojo.jigsaw_gradle_plugin.action.util.JavaDocOption;
-import de.xgme.jojo.jigsaw_gradle_plugin.action.util.OptionGenerator;
-import de.xgme.jojo.jigsaw_gradle_plugin.action.util.SourceUtil;
+import de.xgme.jojo.jigsaw_gradle_plugin._util.JavaDocOption;
+import de.xgme.jojo.jigsaw_gradle_plugin._util.OptionGenerator;
+import de.xgme.jojo.jigsaw_gradle_plugin._util.SourceUtil;
 import de.xgme.jojo.jigsaw_gradle_plugin.extension.task.JavadocExtension;
 import org.gradle.api.Action;
 import org.gradle.api.Task;

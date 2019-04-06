@@ -1,6 +1,6 @@
 package de.xgme.jojo.jigsaw_gradle_plugin.extension.spec;
 
-import de.xgme.jojo.jigsaw_gradle_plugin.action.util.OptionGenerator;
+import de.xgme.jojo.jigsaw_gradle_plugin._util.OptionGenerator;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 

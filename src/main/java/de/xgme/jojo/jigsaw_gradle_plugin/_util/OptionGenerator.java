@@ -1,4 +1,4 @@
-package de.xgme.jojo.jigsaw_gradle_plugin.action.util;
+package de.xgme.jojo.jigsaw_gradle_plugin._util;
 
 import de.xgme.jojo.jigsaw_gradle_plugin.extension.spec.DynamicExportsDeclaration;
 import de.xgme.jojo.jigsaw_gradle_plugin.extension.spec.DynamicReadsDeclaration;

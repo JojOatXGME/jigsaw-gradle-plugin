@@ -1,4 +1,4 @@
-package de.xgme.jojo.jigsaw_gradle_plugin.action;
+package de.xgme.jojo.jigsaw_gradle_plugin._action;
 
 import de.xgme.jojo.jigsaw_gradle_plugin.extension.task.CreateStartScriptsExtension;
 import org.gradle.api.Action;

@@ -1,7 +1,7 @@
-package de.xgme.jojo.jigsaw_gradle_plugin.action;
+package de.xgme.jojo.jigsaw_gradle_plugin._action;
 
-import de.xgme.jojo.jigsaw_gradle_plugin.action.util.ListUtil;
-import de.xgme.jojo.jigsaw_gradle_plugin.action.util.OptionGenerator;
+import de.xgme.jojo.jigsaw_gradle_plugin._util.ListUtil;
+import de.xgme.jojo.jigsaw_gradle_plugin._util.OptionGenerator;
 import de.xgme.jojo.jigsaw_gradle_plugin.extension.task.CreateStartScriptsExtension;
 import org.gradle.api.Action;
 import org.gradle.api.Task;

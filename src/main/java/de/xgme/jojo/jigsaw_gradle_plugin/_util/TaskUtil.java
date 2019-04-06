@@ -1,6 +1,6 @@
-package de.xgme.jojo.jigsaw_gradle_plugin.util;
+package de.xgme.jojo.jigsaw_gradle_plugin._util;
 
-import de.xgme.jojo.jigsaw_gradle_plugin.extension.task.property_marker.Input;
+import de.xgme.jojo.jigsaw_gradle_plugin.extension.task._property_marker.Input;
 import org.gradle.api.Task;
 import org.jetbrains.annotations.NotNull;
 
