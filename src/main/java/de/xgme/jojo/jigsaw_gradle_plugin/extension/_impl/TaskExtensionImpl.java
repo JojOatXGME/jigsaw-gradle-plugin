@@ -83,7 +83,6 @@ public class TaskExtensionImpl
 
   @Override
   public @NotNull DynamicExportsSpec open(@NotNull String... packageNames) {
-    // todo Not required for all tasks. Only relevant at runtime.
     DynamicExports exports = new DynamicExports(Arrays.asList(packageNames));
     dynamicOpens.add(exports);
     return exports;

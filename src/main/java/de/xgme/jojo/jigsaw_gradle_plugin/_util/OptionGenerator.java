@@ -64,13 +64,11 @@ public class OptionGenerator {
     @NotNull Collection<? extends DynamicExportsDeclaration> additionalOpens,
     @NotNull Collection<? extends DynamicReadsDeclaration> additionalReads)
   {
-    // todo --add-opens only required at runtime.
     Map<String, Set<String>> exports = processExports(additionalExports, thisModuleName);
     Map<String, Set<String>> opens   = processExports(additionalOpens, thisModuleName);
     Map<String, Set<String>> reads   = processReads(additionalReads, thisModuleName);
 
     // The option --add-open implies --add-export. Remove exports that are already handled by opens.
-    // todo Is this actually true? Maybe only at runtime?
     for (Map.Entry<String, Set<String>> entry : opens.entrySet()) {
       String      source     = entry.getKey();
       Set<String> opendTo    = entry.getValue();
