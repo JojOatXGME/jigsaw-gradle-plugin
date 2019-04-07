@@ -41,10 +41,6 @@ class UpToDateTest {
       "    enabled = enableForJavadoc.toBoolean()\n" +
       "    moduleName = 'some.module'\n" +
       "}\n" +
-      "jar.jigsaw {\n" +
-      "    enabled = enableForJar.toBoolean()\n" +
-      "    moduleName = 'some.module'\n" +
-      "}\n" +
       "startScripts.jigsaw {\n" +
       "    enabled = enableForStartScripts.toBoolean()\n" +
       "    moduleName = 'some.module'\n" +
@@ -65,7 +61,6 @@ class UpToDateTest {
       "myVersion=1.0\n" +
       "enableForCompileJava=true\n" +
       "enableForJavadoc=true\n" +
-      "enableForJar=true\n" +
       "enableForStartScripts=true\n");
   }
 
@@ -110,32 +105,6 @@ class UpToDateTest {
       Assertions.assertNotNull(javadocResult);
       Assertions.assertEquals(TaskOutcome.UP_TO_DATE, compileResult.getOutcome());
       Assertions.assertEquals(TaskOutcome.SUCCESS, javadocResult.getOutcome());
-    }
-  }
-
-  @Test
-  @Disabled("There is nothing implemented for this task yet.")
-  void testJarTask() {
-    project.createRunner().withArguments(":jar", "-PenableForJar=true").build();
-
-    {
-      BuildResult result        = project.createRunner().withArguments(":jar", "-PenableForJar=true").build();
-      BuildTask   compileResult = result.task(":compileJava");
-      BuildTask   jarResult     = result.task(":jar");
-      Assertions.assertNotNull(compileResult);
-      Assertions.assertNotNull(jarResult);
-      Assertions.assertEquals(TaskOutcome.UP_TO_DATE, compileResult.getOutcome());
-      Assertions.assertEquals(TaskOutcome.UP_TO_DATE, jarResult.getOutcome());
-    }
-
-    {
-      BuildResult result        = project.createRunner().withArguments(":jar", "-PenableForJar=false").build();
-      BuildTask   compileResult = result.task(":compileJava");
-      BuildTask   jarResult     = result.task(":jar");
-      Assertions.assertNotNull(compileResult);
-      Assertions.assertNotNull(jarResult);
-      Assertions.assertEquals(TaskOutcome.UP_TO_DATE, compileResult.getOutcome());
-      Assertions.assertEquals(TaskOutcome.SUCCESS, jarResult.getOutcome());
     }
   }
 

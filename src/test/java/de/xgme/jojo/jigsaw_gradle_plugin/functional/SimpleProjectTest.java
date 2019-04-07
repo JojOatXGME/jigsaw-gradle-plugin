@@ -143,5 +143,5 @@ class SimpleProjectTest {
     Assertions.assertEquals(TaskOutcome.SUCCESS, task.getOutcome());
   }
 
-  // todo javadoc, CreateStartScripts, jar
+  // todo javadoc, CreateStartScripts
 }

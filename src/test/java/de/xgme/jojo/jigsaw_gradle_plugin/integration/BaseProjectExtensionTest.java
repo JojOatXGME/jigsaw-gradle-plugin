@@ -11,7 +11,6 @@ import org.gradle.api.plugins.ApplicationPlugin;
 import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.tasks.JavaExec;
 import org.gradle.api.tasks.application.CreateStartScripts;
-import org.gradle.api.tasks.bundling.Jar;
 import org.gradle.api.tasks.compile.JavaCompile;
 import org.gradle.api.tasks.javadoc.Javadoc;
 import org.gradle.testfixtures.ProjectBuilder;
@@ -42,8 +41,7 @@ class BaseProjectExtensionTest {
       () -> assertEnabled(getTask(project, JavaPlugin.TEST_TASK_NAME), true),
       () -> assertModuleName(getTask(project, JavaPlugin.TEST_TASK_NAME), MODULE_NAME),
       () -> assertEnabled(getTask(project, JavaPlugin.JAVADOC_TASK_NAME), true),
-      () -> assertModuleName(getTask(project, JavaPlugin.JAVADOC_TASK_NAME), MODULE_NAME),
-      () -> assertEnabled(getTask(project, JavaPlugin.JAR_TASK_NAME), true));
+      () -> assertModuleName(getTask(project, JavaPlugin.JAVADOC_TASK_NAME), MODULE_NAME));
   }
 
   @Test
@@ -73,7 +71,6 @@ class BaseProjectExtensionTest {
     Task javaCompileTask = createTask(project, JavaCompile.class);
     Task testTask = createTask(project, org.gradle.api.tasks.testing.Test.class);
     Task javadocTask = createTask(project, Javadoc.class);
-    Task jarTask = createTask(project, Jar.class);
     Task runTask = createTask(project, JavaExec.class);
     Task createStartScriptsTask = createTask(project, CreateStartScripts.class);
 
@@ -84,7 +81,6 @@ class BaseProjectExtensionTest {
       () -> assertModuleName(testTask, MODULE_NAME),
       () -> assertEnabled(javadocTask, true),
       () -> assertModuleName(javadocTask, MODULE_NAME),
-      () -> assertEnabled(jarTask, true),
       () -> assertEnabled(runTask, true),
       () -> assertModuleName(runTask, MODULE_NAME),
       () -> assertEnabled(createStartScriptsTask, true),

@@ -7,7 +7,6 @@ import org.gradle.api.plugins.ApplicationPlugin;
 import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.tasks.JavaExec;
 import org.gradle.api.tasks.application.CreateStartScripts;
-import org.gradle.api.tasks.bundling.Jar;
 import org.gradle.api.tasks.compile.JavaCompile;
 import org.gradle.api.tasks.javadoc.Javadoc;
 import org.gradle.api.tasks.testing.Test;
@@ -42,10 +41,6 @@ public class JigsawConventionPlugin implements Plugin<Project> {
       target.getTasks().withType(Javadoc.class).named(JavaPlugin.JAVADOC_TASK_NAME, task -> {
         JavadocExtension extension = task.getExtensions().getByType(JavadocExtension.class);
         extension.setEnabled(true);
-      });
-
-      target.getTasks().withType(Jar.class).named(JavaPlugin.JAR_TASK_NAME, task -> {
-        // todo Handle this task.
       });
     });
 

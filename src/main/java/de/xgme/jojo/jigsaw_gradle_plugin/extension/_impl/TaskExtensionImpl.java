@@ -16,7 +16,6 @@ import java.util.List;
 
 public class TaskExtensionImpl
   implements CreateStartScriptsExtension,
-             JarExtension,
              JavaCompileExtension,
              JavadocExtension,
              JavaExecExtension,

@@ -1,17 +1,16 @@
 package de.xgme.jojo.jigsaw_gradle_plugin;
 
 import de.xgme.jojo.jigsaw_gradle_plugin._action.*;
-import de.xgme.jojo.jigsaw_gradle_plugin.extension.project.BaseProjectExtension;
-import de.xgme.jojo.jigsaw_gradle_plugin.extension._impl.TaskExtensionImpl;
-import de.xgme.jojo.jigsaw_gradle_plugin.extension.task.*;
 import de.xgme.jojo.jigsaw_gradle_plugin._util.TaskUtil;
+import de.xgme.jojo.jigsaw_gradle_plugin.extension._impl.TaskExtensionImpl;
+import de.xgme.jojo.jigsaw_gradle_plugin.extension.project.BaseProjectExtension;
+import de.xgme.jojo.jigsaw_gradle_plugin.extension.task.*;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 import org.gradle.api.tasks.JavaExec;
 import org.gradle.api.tasks.application.CreateStartScripts;
-import org.gradle.api.tasks.bundling.Jar;
 import org.gradle.api.tasks.compile.JavaCompile;
 import org.gradle.api.tasks.javadoc.Javadoc;
 import org.gradle.api.tasks.testing.Test;
@@ -46,14 +45,6 @@ public class JigsawBasePlugin implements Plugin<Project> {
       JavadocExtension extension = TaskUtil.createExtension(task, JavadocExtension.class, "jigsaw",
                                                             TaskExtensionImpl.class, projectExtension);
       task.doFirst(new JavadocReconfigurationAction(extension));
-    });
-
-    target.getTasks().withType(Jar.class, task -> {
-      JarExtension extension = TaskUtil.createExtension(task, JarExtension.class, "jigsaw",
-                                                        TaskExtensionImpl.class, projectExtension);
-      // todo Add option for --module-version.
-      // todo Add option for --hash-modules.
-      // todo Add option --main-class=<class>.
     });
 
     target.getTasks().withType(JavaExec.class, task -> {
