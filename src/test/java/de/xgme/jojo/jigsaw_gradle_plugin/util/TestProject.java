@@ -35,7 +35,9 @@ public class TestProject {
   public @NotNull GradleRunner createRunner() {
     GradleRunner runner = GradleRunner.create()
                                       .withProjectDir(projectDir.toFile())
-                                      .withPluginClasspath();
+                                      .withPluginClasspath()
+                                      .withDebug(true)
+                                      .forwardOutput();
     if (gradleVersion != null) {
       runner = runner.withGradleVersion(gradleVersion);
     }
