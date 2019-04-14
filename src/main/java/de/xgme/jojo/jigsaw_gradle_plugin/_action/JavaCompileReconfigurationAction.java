@@ -1,8 +1,9 @@
 package de.xgme.jojo.jigsaw_gradle_plugin._action;
 
 import de.xgme.jojo.jigsaw_gradle_plugin._util.ListUtil;
+import de.xgme.jojo.jigsaw_gradle_plugin._util.ModuleUtil;
 import de.xgme.jojo.jigsaw_gradle_plugin._util.OptionGenerator;
-import de.xgme.jojo.jigsaw_gradle_plugin._util.SourceUtil;
+import de.xgme.jojo.jigsaw_gradle_plugin._util.SourceSetUtil;
 import de.xgme.jojo.jigsaw_gradle_plugin.extension.task.JavaCompileExtension;
 import org.gradle.api.Action;
 import org.gradle.api.Project;
@@ -15,11 +16,8 @@ import org.gradle.api.tasks.compile.JavaCompile;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.lang.module.ModuleFinder;
-import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public final class JavaCompileReconfigurationAction implements Action<Task> {
   private @NotNull JavaCompileExtension extension;
@@ -40,11 +38,11 @@ public final class JavaCompileReconfigurationAction implements Action<Task> {
     JavaCompile    task           = (JavaCompile) looselyTypedTask;
     String         moduleName     = extension.getModuleName();
     String         moduleVersion  = extension.getModuleVersion();
-    FileCollection localClasspath = getLocalClasspath(task.getProject(), task.getClasspath());
+    FileCollection localClasspath = SourceSetUtil.getLocalClasspath(task.getProject(), task.getClasspath());
     FileCollection modulePath     = task.getClasspath().minus(localClasspath);
 
     if (moduleName == null) {
-      moduleName = SourceUtil.findModuleNameFromSource(task.getSource());
+      moduleName = ModuleUtil.findModuleNameFromSource(task.getSource());
     }
 
     task.getOptions().setCompilerArgs(ListUtil.concat(
@@ -58,11 +56,7 @@ public final class JavaCompileReconfigurationAction implements Action<Task> {
   }
 
   private static @NotNull List<String> getOptionsToAddAllModules(@NotNull FileCollection modulePath) {
-    Path[]       modulePathArray = modulePath.getFiles().stream().map(File::toPath).toArray(Path[]::new);
-    ModuleFinder moduleFinder    = ModuleFinder.of(modulePathArray);
-    List<String> moduleNames = moduleFinder.findAll().stream()
-                                           .map(ref -> ref.descriptor().name())
-                                           .collect(Collectors.toList());
+    List<String> moduleNames = ModuleUtil.findModuleNames(modulePath);
     if (moduleNames.isEmpty()) {
       return Collections.emptyList();
     }
@@ -71,18 +65,4 @@ public final class JavaCompileReconfigurationAction implements Action<Task> {
     }
   }
 
-  private static @NotNull FileCollection getLocalClasspath(@NotNull Project project,
-                                                           @NotNull FileCollection fullClasspath)
-  {
-    JavaPluginConvention       javaConvention = project.getConvention().getPlugin(JavaPluginConvention.class);
-    ConfigurableFileCollection localClasspath = project.files();
-    for (File classpathElement : fullClasspath.getFiles()) {
-      for (SourceSet sourceSet : javaConvention.getSourceSets()) {
-        if (sourceSet.getOutput().contains(classpathElement)) {
-          localClasspath.from(classpathElement);
-        }
-      }
-    }
-    return localClasspath;
-  }
 }
