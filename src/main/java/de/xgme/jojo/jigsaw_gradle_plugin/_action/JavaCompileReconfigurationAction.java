@@ -6,16 +6,11 @@ import de.xgme.jojo.jigsaw_gradle_plugin._util.OptionGenerator;
 import de.xgme.jojo.jigsaw_gradle_plugin._util.SourceSetUtil;
 import de.xgme.jojo.jigsaw_gradle_plugin.extension.task.JavaCompileExtension;
 import org.gradle.api.Action;
-import org.gradle.api.Project;
 import org.gradle.api.Task;
-import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.file.FileCollection;
-import org.gradle.api.plugins.JavaPluginConvention;
-import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.compile.JavaCompile;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
@@ -39,7 +34,7 @@ public final class JavaCompileReconfigurationAction implements Action<Task> {
     String         moduleName     = extension.getModuleName();
     String         moduleVersion  = extension.getModuleVersion();
     FileCollection localClasspath = SourceSetUtil.getLocalClasspath(task.getProject(), task.getClasspath());
-    FileCollection modulePath     = task.getClasspath().minus(localClasspath);
+    FileCollection sourceDirs     = SourceSetUtil.getSourceDirs(task.getProject(), task.getSource());
 
     if (moduleName == null) {
       moduleName = ModuleUtil.findModuleNameFromSource(task.getSource());
@@ -47,12 +42,13 @@ public final class JavaCompileReconfigurationAction implements Action<Task> {
 
     task.getOptions().setCompilerArgs(ListUtil.concat(
       task.getOptions().getCompilerArgs(),
-      List.of("--module-path", modulePath.getAsPath()),
+      List.of("--module-path", task.getClasspath().getAsPath()),
       moduleVersion == null ? Collections.emptyList() : List.of("--module-version", moduleVersion),
       OptionGenerator.generateArguments(moduleName,
                                         extension.getExports(), Collections.emptyList(), extension.getReads()),
-      getOptionsToAddAllModules(modulePath)));
-    task.setClasspath(localClasspath);
+      List.of("--patch-module", moduleName + "=" + localClasspath.plus(sourceDirs).getAsPath()),
+      getOptionsToAddAllModules(task.getClasspath()))); // todo Only add modules specified in extension.getReads()
+    task.setClasspath(task.getProject().files());
   }
 
   private static @NotNull List<String> getOptionsToAddAllModules(@NotNull FileCollection modulePath) {

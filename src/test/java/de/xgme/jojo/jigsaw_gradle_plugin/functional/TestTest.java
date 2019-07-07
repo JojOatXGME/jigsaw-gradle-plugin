@@ -14,7 +14,7 @@ import java.io.IOException;
 
 @GradleVersion("5.2")
 @Functional
-class JavaCompileTest {
+class TestTest {
   @Test
   @DisplayName("Exported packages of required libraries must be accessible")
   void testReferenceToRequiredLibrary(TestProject project) throws IOException {
@@ -52,29 +52,46 @@ class JavaCompileTest {
       "    enabled = true\n" +
       "    moduleName = 'consumer'\n" +
       "}\n" +
+      "compileTestJava.jigsaw {\n" +
+      "    enabled = true\n" +
+      "    moduleName = 'consumer'\n" +
+      "    require 'junit'\n" +
+      "}\n" +
+      "test.jigsaw {\n" +
+      "    enabled = true\n" +
+      "    moduleName = 'consumer'\n" +
+      "    require 'junit'\n" +
+      "    open 'consumer' to 'junit'\n" +
+      "}\n" +
+      "repositories {\n" +
+      "    mavenCentral()\n" +
+      "}\n" +
       "dependencies {\n" +
       "    implementation project(':library')\n" +
+      "    testImplementation 'junit:junit:4.12'\n" +
       "}\n");
     project.createFile("src/main/java/module-info.java").rawContent(
       // language=java
       "module consumer {\n" +
       "  requires library;\n" +
       "}\n");
-    project.createFile("src/main/java/consumer/Main.java").rawContent(
+    project.createFile("src/test/java/consumer/Main.java").rawContent(
       // language=java
       "package consumer;\n" +
       "import library.EmptyClass;\n" +
+      "import org.junit.Test;\n" +
       "public class Main {\n" +
-      "  public static void main(String[] args) {\n" +
+      "  @Test\n" +
+      "  public void main() {\n" +
       "    System.out.println(EmptyClass.class);\n" +
       "  }\n" +
       "}\n");
 
-    BuildResult result          = project.createRunner().withArguments("--stacktrace", ":compileJava").build();
-    BuildTask   compileJavaTask = result.task(":compileJava");
+    BuildResult result   = project.createRunner().withArguments("--stacktrace", ":test").build();
+    BuildTask   testTask = result.task(":test");
 
-    Assertions.assertNotNull(compileJavaTask);
-    Assertions.assertEquals(TaskOutcome.SUCCESS, compileJavaTask.getOutcome());
+    Assertions.assertNotNull(testTask);
+    Assertions.assertEquals(TaskOutcome.SUCCESS, testTask.getOutcome());
   }
 
   @Test
@@ -113,29 +130,47 @@ class JavaCompileTest {
       "    enabled = true\n" +
       "    moduleName = 'consumer'\n" +
       "}\n" +
+      "compileTestJava.jigsaw {\n" +
+      "    enabled = true\n" +
+      "    moduleName = 'consumer'\n" +
+      "    require 'junit'\n" +
+      "    export 'library' from 'library'\n" +
+      "}\n" +
+      "test.jigsaw {\n" +
+      "    enabled = true\n" +
+      "    moduleName = 'consumer'\n" +
+      "    require 'junit'\n" +
+      "    open 'consumer' to 'junit'\n" +
+      "}\n" +
+      "repositories {\n" +
+      "    mavenCentral()\n" +
+      "}\n" +
       "dependencies {\n" +
       "    implementation project(':library')\n" +
+      "    testImplementation 'junit:junit:4.12'\n" +
       "}\n");
     project.createFile("src/main/java/module-info.java").rawContent(
       // language=java
       "module consumer {\n" +
       "  requires library;\n" +
       "}\n");
-    project.createFile("src/main/java/consumer/Main.java").rawContent(
+    project.createFile("src/test/java/consumer/Main.java").rawContent(
       // language=java
       "package consumer;\n" +
       "import library.EmptyClass;\n" +
+      "import org.junit.Test;\n" +
       "public class Main {\n" +
-      "  public static void main(String[] args) {\n" +
+      "  @Test\n" +
+      "  public void main() {\n" +
       "    System.out.println(EmptyClass.class);\n" +
       "  }\n" +
       "}\n");
 
-    BuildResult result          = project.createRunner().withArguments("--stacktrace", ":compileJava").buildAndFail();
-    BuildTask   compileJavaTask = result.task(":compileJava");
+    BuildResult result   = project.createRunner().withArguments("--stacktrace", ":test").buildAndFail();
+    BuildTask   testTask = result.task(":test");
 
-    Assertions.assertNotNull(compileJavaTask);
-    Assertions.assertEquals(TaskOutcome.FAILED, compileJavaTask.getOutcome());
+    Assertions.assertNotNull(testTask);
+    Assertions.assertEquals(TaskOutcome.FAILED, testTask.getOutcome());
   }
 
   @Test
@@ -175,28 +210,46 @@ class JavaCompileTest {
       "    enabled = true\n" +
       "    moduleName = 'consumer'\n" +
       "}\n" +
+      "compileTestJava.jigsaw {\n" +
+      "    enabled = true\n" +
+      "    moduleName = 'consumer'\n" +
+      "    require 'junit'\n" +
+      "    require 'library'\n" +
+      "}\n" +
+      "test.jigsaw {\n" +
+      "    enabled = true\n" +
+      "    moduleName = 'consumer'\n" +
+      "    require 'junit'\n" +
+      "    open 'consumer' to 'junit'\n" +
+      "}\n" +
+      "repositories {\n" +
+      "    mavenCentral()\n" +
+      "}\n" +
       "dependencies {\n" +
       "    implementation project(':library')\n" +
+      "    testImplementation 'junit:junit:4.12'\n" +
       "}\n");
     project.createFile("src/main/java/module-info.java").rawContent(
       // language=java
       "module consumer {\n" +
       "}\n");
-    project.createFile("src/main/java/consumer/Main.java").rawContent(
+    project.createFile("src/test/java/consumer/Main.java").rawContent(
       // language=java
       "package consumer;\n" +
       "import library.EmptyClass;\n" +
+      "import org.junit.Test;\n" +
       "public class Main {\n" +
-      "  public static void main(String[] args) {\n" +
+      "  @Test\n" +
+      "  public void main() {\n" +
       "    System.out.println(EmptyClass.class);\n" +
       "  }\n" +
       "}\n");
 
-    BuildResult result          = project.createRunner().withArguments("--stacktrace", ":compileJava").buildAndFail();
-    BuildTask   compileJavaTask = result.task(":compileJava");
+    BuildResult result   = project.createRunner().withArguments("--stacktrace", ":test").buildAndFail();
+    BuildTask   testTask = result.task(":test");
 
-    Assertions.assertNotNull(compileJavaTask);
-    Assertions.assertEquals(TaskOutcome.FAILED, compileJavaTask.getOutcome());
+    Assertions.assertNotNull(testTask);
+    Assertions.assertEquals(TaskOutcome.FAILED, testTask.getOutcome());
   }
 
   @Test
@@ -237,28 +290,47 @@ class JavaCompileTest {
       "    moduleName = 'consumer'\n" +
       "    require 'library'\n" +
       "}\n" +
+      "compileTestJava.jigsaw {\n" +
+      "    enabled = true\n" +
+      "    moduleName = 'consumer'\n" +
+      "    require 'junit'\n" +
+      "    require 'library'\n" +
+      "}\n" +
+      "test.jigsaw {\n" +
+      "    enabled = true\n" +
+      "    moduleName = 'consumer'\n" +
+      "    require 'junit'\n" +
+      "    open 'consumer' to 'junit'\n" +
+      "    require 'library'\n" +
+      "}\n" +
+      "repositories {\n" +
+      "    mavenCentral()\n" +
+      "}\n" +
       "dependencies {\n" +
       "    implementation project(':library')\n" +
+      "    testImplementation 'junit:junit:4.12'\n" +
       "}\n");
     project.createFile("src/main/java/module-info.java").rawContent(
       // language=java
       "module consumer {\n" +
       "}\n");
-    project.createFile("src/main/java/consumer/Main.java").rawContent(
+    project.createFile("src/test/java/consumer/Main.java").rawContent(
       // language=java
       "package consumer;\n" +
       "import library.EmptyClass;\n" +
+      "import org.junit.Test;\n" +
       "public class Main {\n" +
-      "  public static void main(String[] args) {\n" +
+      "  @Test\n" +
+      "  public void main() {\n" +
       "    System.out.println(EmptyClass.class);\n" +
       "  }\n" +
       "}\n");
 
-    BuildResult result          = project.createRunner().withArguments("--stacktrace", ":compileJava").build();
-    BuildTask   compileJavaTask = result.task(":compileJava");
+    BuildResult result   = project.createRunner().withArguments("--stacktrace", ":test").build();
+    BuildTask   testTask = result.task(":test");
 
-    Assertions.assertNotNull(compileJavaTask);
-    Assertions.assertEquals(TaskOutcome.SUCCESS, compileJavaTask.getOutcome());
+    Assertions.assertNotNull(testTask);
+    Assertions.assertEquals(TaskOutcome.SUCCESS, testTask.getOutcome());
   }
 
   @Test
@@ -298,33 +370,52 @@ class JavaCompileTest {
       "    moduleName = 'consumer'\n" +
       "    export 'library' from 'library'\n" +
       "}\n" +
+      "compileTestJava.jigsaw {\n" +
+      "    enabled = true\n" +
+      "    moduleName = 'consumer'\n" +
+      "    require 'junit'\n" +
+      "    export 'library' from 'library'\n" +
+      "}\n" +
+      "test.jigsaw {\n" +
+      "    enabled = true\n" +
+      "    moduleName = 'consumer'\n" +
+      "    require 'junit'\n" +
+      "    open 'consumer' to 'junit'\n" +
+      "    export 'library' from 'library'\n" +
+      "}\n" +
+      "repositories {\n" +
+      "    mavenCentral()\n" +
+      "}\n" +
       "dependencies {\n" +
       "    implementation project(':library')\n" +
+      "    testImplementation 'junit:junit:4.12'\n" +
       "}\n");
     project.createFile("src/main/java/module-info.java").rawContent(
       // language=java
       "module consumer {\n" +
       "  requires library;\n" +
       "}\n");
-    project.createFile("src/main/java/consumer/Main.java").rawContent(
+    project.createFile("src/test/java/consumer/Main.java").rawContent(
       // language=java
       "package consumer;\n" +
       "import library.EmptyClass;\n" +
+      "import org.junit.Test;\n" +
       "public class Main {\n" +
-      "  public static void main(String[] args) {\n" +
+      "  @Test\n" +
+      "  public void main() {\n" +
       "    System.out.println(EmptyClass.class);\n" +
       "  }\n" +
       "}\n");
 
-    BuildResult result          = project.createRunner().withArguments("--stacktrace", ":compileJava").build();
-    BuildTask   compileJavaTask = result.task(":compileJava");
+    BuildResult result   = project.createRunner().withArguments("--stacktrace", ":test").build();
+    BuildTask   testTask = result.task(":test");
 
-    Assertions.assertNotNull(compileJavaTask);
-    Assertions.assertEquals(TaskOutcome.SUCCESS, compileJavaTask.getOutcome());
+    Assertions.assertNotNull(testTask);
+    Assertions.assertEquals(TaskOutcome.SUCCESS, testTask.getOutcome());
   }
 
   @Test
-  @DisplayName("All packages of other source sets must be accessible")
+  @DisplayName("All classes of other source sets must be accessible")
   void testInternalReferenceToOtherSourceSet(TestProject project) throws IOException {
     project.createFile("settings.gradle").rawContent(
       // language=groovy
@@ -342,6 +433,19 @@ class JavaCompileTest {
       "compileTestJava.jigsaw {\n" +
       "    enabled = true\n" +
       "    moduleName = 'some.module'\n" +
+      "    require 'junit'\n" +
+      "}\n" +
+      "test.jigsaw {\n" +
+      "    enabled = true\n" +
+      "    moduleName = 'some.module'\n" +
+      "    require 'junit'\n" +
+      "    open 'pkg' to 'junit'\n" +
+      "}\n" +
+      "repositories {\n" +
+      "    mavenCentral()\n" +
+      "}\n" +
+      "dependencies {\n" +
+      "    testImplementation 'junit:junit:4.12'\n" +
       "}\n");
     project.createFile("src/main/java/module-info.java").rawContent(
       // language=java
@@ -352,22 +456,21 @@ class JavaCompileTest {
       "package pkg;\n" +
       "public class EmptyClass {\n" +
       "}\n");
-    project.createFile("src/test/java/pkg/TestClass.java").rawContent(
+    project.createFile("src/test/java/consumer/Main.java").rawContent(
       // language=java
       "package pkg;\n" +
-      "public class TestClass {\n" +
-      "  public void test() {\n" +
+      "import org.junit.Test;\n" +
+      "public class Main {\n" +
+      "  @Test\n" +
+      "  public void main() {\n" +
       "    System.out.println(EmptyClass.class);\n" +
       "  }\n" +
       "}\n");
 
-    BuildResult result              = project.createRunner().withArguments("--stacktrace", ":compileTestJava").build();
-    BuildTask   compileJavaTask     = result.task(":compileJava");
-    BuildTask   compileTestJavaTask = result.task(":compileTestJava");
+    BuildResult result   = project.createRunner().withArguments("--stacktrace", ":test").build();
+    BuildTask   testTask = result.task(":test");
 
-    Assertions.assertNotNull(compileJavaTask);
-    Assertions.assertEquals(TaskOutcome.SUCCESS, compileJavaTask.getOutcome());
-    Assertions.assertNotNull(compileTestJavaTask);
-    Assertions.assertEquals(TaskOutcome.SUCCESS, compileTestJavaTask.getOutcome());
+    Assertions.assertNotNull(testTask);
+    Assertions.assertEquals(TaskOutcome.SUCCESS, testTask.getOutcome());
   }
 }
