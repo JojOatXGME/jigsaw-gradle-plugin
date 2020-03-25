@@ -10,7 +10,7 @@ import org.gradle.api.tasks.testing.Test;
 import org.jetbrains.annotations.NotNull;
 
 public final class TestReconfigurationAction implements Action<Task> {
-  private @NotNull TestExtension extension;
+  private final @NotNull TestExtension extension;
 
   public TestReconfigurationAction(@NotNull TestExtension extension) {
     this.extension = extension;

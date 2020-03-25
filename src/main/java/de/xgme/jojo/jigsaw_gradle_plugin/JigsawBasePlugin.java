@@ -21,7 +21,11 @@ public class JigsawBasePlugin implements Plugin<Project> {
   public void apply(@NotNull Project target) {
     // todo Add option to set --illegal-access=deny at runtime.
     // todo Add support for jlink? (https://openjdk.java.net/projects/jigsaw/quick-start)
-    // todo Set --patch-module by inspecting source sets.
+    // todo Add support for JMOD archives? (https://openjdk.java.net/jeps/261)
+    // todo Generate legacy service files from module-info.java.
+    // todo Add extension to source sets, allow multiple modules per project.
+    // todo Sometimes, some transitive runtime dependencies should stay on the classpath instead of the module path.
+    // todo Avoid usage of ALL-MODULE-PATH. Only use it when necessary.
     final Logger logger = Logging.getLogger(JigsawBasePlugin.class);
 
     BaseProjectExtension projectExtension = target.getExtensions().create("jigsaw", BaseProjectExtension.class);
@@ -31,9 +35,6 @@ public class JigsawBasePlugin implements Plugin<Project> {
                                                                 TaskExtensionImpl.class, projectExtension);
       task.doFirst(new JavaCompileReconfigurationAction(extension));
     });
-
-    // todo Add support for JMOD archives? (https://openjdk.java.net/jeps/261)
-    // todo Check compilerTestJava (probably also JavaCompile.class).
 
     target.getTasks().withType(Test.class, task -> {
       TestExtension extension = TaskUtil.createExtension(task, TestExtension.class, "jigsaw",
@@ -57,8 +58,9 @@ public class JigsawBasePlugin implements Plugin<Project> {
       CreateStartScriptsExtension extension = TaskUtil.createExtension(task, CreateStartScriptsExtension.class,
                                                                        "jigsaw",
                                                                        TaskExtensionImpl.class, projectExtension);
-      task.doFirst(new CreateStartScriptsReconfigurationAction(extension));
-      task.doLast(new CreateStartScriptsPostprocessingAction(extension));
+      CreateStartScriptsReconfigurationAction doFirst = new CreateStartScriptsReconfigurationAction(extension);
+      task.doFirst(doFirst);
+      task.doLast(new CreateStartScriptsPostprocessingAction(extension, doFirst));
     });
   }
 }

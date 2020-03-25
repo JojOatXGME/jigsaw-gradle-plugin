@@ -4,20 +4,28 @@ import de.xgme.jojo.jigsaw_gradle_plugin.extension.task.CreateStartScriptsExtens
 import org.gradle.api.Action;
 import org.gradle.api.GradleException;
 import org.gradle.api.Task;
+import org.gradle.api.file.FileCollection;
 import org.gradle.api.tasks.application.CreateStartScripts;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.regex.Matcher;
+import java.util.stream.Collectors;
 
 public final class CreateStartScriptsPostprocessingAction implements Action<Task> {
-  private @NotNull CreateStartScriptsExtension extension;
+  private final @NotNull CreateStartScriptsExtension             extension;
+  private final @NotNull CreateStartScriptsReconfigurationAction reconfigurationAction;
 
-  public CreateStartScriptsPostprocessingAction(@NotNull CreateStartScriptsExtension extension) {
+  public CreateStartScriptsPostprocessingAction(
+    @NotNull CreateStartScriptsExtension extension,
+    @NotNull CreateStartScriptsReconfigurationAction reconfigurationAction)
+  {
     this.extension = extension;
+    this.reconfigurationAction = reconfigurationAction;
   }
 
   @Override
@@ -35,25 +43,49 @@ public final class CreateStartScriptsPostprocessingAction implements Action<Task
       throw new GradleException("Application name is null in task " + task.getPath());
     }
     try {
-      File   bashFile    = new File(task.getOutputDir(), applicationName);
-      String bashContent = read(bashFile);
-      write(bashFile, bashContent.replaceFirst("APP_HOME_LIBS_PLACEHOLDER",
-                                               Matcher.quoteReplacement("$APP_HOME/lib")));
-      File   batFile    = new File(task.getOutputDir(), applicationName + ".bat");
-      String batContent = read(batFile);
-      write(batFile, batContent.replaceFirst("APP_HOME_LIBS_PLACEHOLDER",
-                                             Matcher.quoteReplacement("%APP_HOME%\\lib")));
+      replaceLibsPlaceholder(new File(task.getOutputDir(), applicationName),
+                             reconfigurationAction.getModulePath(), false);
+      replaceLibsPlaceholder(new File(task.getOutputDir(), applicationName + ".bat"),
+                             reconfigurationAction.getModulePath(), true);
     }
     catch (IOException e) {
       throw new GradleException("Could not modify start scripts for " + task.getPath(), e);
     }
   }
 
-  private static @NotNull String read(@NotNull File file) throws IOException {
-    return Files.readString(file.toPath(), StandardCharsets.UTF_8);
+  private static void replaceLibsPlaceholder(@NotNull File file, @Nullable FileCollection modulePath, boolean windows)
+    throws IOException
+  {
+    String content = Files.readString(file.toPath(), StandardCharsets.UTF_8);
+    Files.writeString(
+      file.toPath(),
+      content.replaceFirst(
+        "APP_HOME_LIBS_PLACEHOLDER",
+        Matcher.quoteReplacement(buildRelativeModulePath(modulePath, windows))),
+      StandardCharsets.UTF_8);
   }
 
-  private static void write(@NotNull File file, @NotNull String content) throws IOException {
-    Files.writeString(file.toPath(), content, StandardCharsets.UTF_8);
+  private static @NotNull String buildRelativeModulePath(@Nullable FileCollection modulePath, boolean windows) {
+    if (modulePath == null) {
+      return "";
+    }
+
+    String prefix;
+    String pathSeparator;
+    String segmentSeparator;
+    if (windows) {
+      prefix = "%APP_HOME%";
+      pathSeparator = ";";
+      segmentSeparator = "\\";
+    }
+    else {
+      prefix = "$APP_HOME";
+      pathSeparator = ":";
+      segmentSeparator = "/";
+    }
+
+    return modulePath.getFiles().stream()
+                     .map(file -> prefix + segmentSeparator + "lib" + segmentSeparator + file.getName())
+                     .collect(Collectors.joining(pathSeparator));
   }
 }

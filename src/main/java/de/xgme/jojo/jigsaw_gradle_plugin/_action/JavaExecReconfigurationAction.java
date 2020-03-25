@@ -15,7 +15,7 @@ import java.lang.reflect.Field;
 import java.util.List;
 
 public final class JavaExecReconfigurationAction implements Action<Task> {
-  private @NotNull JavaExecExtension extension;
+  private final @NotNull JavaExecExtension extension;
 
   public JavaExecReconfigurationAction(@NotNull JavaExecExtension extension) {
     this.extension = extension;

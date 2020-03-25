@@ -15,7 +15,7 @@ import java.util.Collections;
 import java.util.List;
 
 public final class JavaCompileReconfigurationAction implements Action<Task> {
-  private @NotNull JavaCompileExtension extension;
+  private final @NotNull JavaCompileExtension extension;
 
   public JavaCompileReconfigurationAction(@NotNull JavaCompileExtension extension) {
     this.extension = extension;

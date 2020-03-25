@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 public final class JavadocReconfigurationAction implements Action<Task> {
-  private @NotNull JavadocExtension extension;
+  private final @NotNull JavadocExtension extension;
 
   public JavadocReconfigurationAction(@NotNull JavadocExtension extension) {
     this.extension = extension;
