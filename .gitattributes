@@ -1,0 +1,6 @@
+# Gradle wrapper distribution
+/gradlew        -text
+/gradlew.bat    -text
+
+# Source files
+*.java          diff=java
